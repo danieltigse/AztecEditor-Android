@@ -68,7 +68,7 @@ class CssStyleFormatter {
         }
 
         private fun getMatcher(attributes: AztecAttributes, styleAttributeName: String): Matcher {
-            val style = (attributes.getValue(STYLE_ATTRIBUTE) ?: "").replace("\\s".toRegex(), "")
+            val style = (attributes.getValue(STYLE_ATTRIBUTE) ?: "")
             return getPattern(styleAttributeName).matcher(style)
         }
 
