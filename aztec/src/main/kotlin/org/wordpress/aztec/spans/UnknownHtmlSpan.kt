@@ -18,7 +18,7 @@ class UnknownHtmlSpan @JvmOverloads constructor(
 
     companion object {
         // Following tags are ignored
-        val KNOWN_TAGS = setOf("html", "body")
+        val KNOWN_TAGS = setOf("html", "body", "table", "tbody", "thead", "th", "tr", "td", "center")
     }
 
     interface OnUnknownHtmlTappedListener {
