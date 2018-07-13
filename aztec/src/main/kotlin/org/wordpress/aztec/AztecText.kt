@@ -1045,36 +1045,49 @@ open class AztecText : AppCompatEditText, TextWatcher, UnknownHtmlSpan.OnUnknown
 
     private fun loadImages() {
         val spans = this.text.getSpans(0, text.length, AztecImageSpan::class.java)
-        val loadingDrawable = AztecText.getPlaceholderDrawableFromResID(context, drawableLoading, maxImagesWidth)
+        if(spans.isNotEmpty()){
+            loadImage(spans, 0)
+        }
+    }
+
+    private fun loadImage(spans: Array<AztecImageSpan>, index: Int){
 
         // Make sure to keep a reference to the maxWidth, otherwise in the Callbacks there is
         // the wrong value when used in 3rd party app
         val maxDimension = maxImagesWidth
-        spans.forEach {
-            val callbacks = object : Html.ImageGetter.Callbacks {
-                override fun onImageFailed() {
-                    replaceImage(
-                            AztecText.getPlaceholderDrawableFromResID(context, drawableFailed, maxImagesWidth)
-                    )
-                }
+        val loadingDrawable = AztecText.getPlaceholderDrawableFromResID(context, drawableLoading, maxImagesWidth)
 
-                override fun onImageLoaded(drawable: Drawable?) {
-                    replaceImage(drawable)
-                }
-
-                override fun onImageLoading(drawable: Drawable?) {
-                    replaceImage(drawable ?: loadingDrawable)
-                }
-
-                private fun replaceImage(drawable: Drawable?) {
-                    it.drawable = drawable
-                    post {
-                        refreshText(false)
-                    }
-                }
-            }
-            imageGetter?.loadImage(it.getSource(), callbacks, maxDimension, minImagesWidth)
+        if(index >= spans.size){
+            return
         }
+
+        val span = spans[index]
+        val callbacks = object : Html.ImageGetter.Callbacks {
+            override fun onImageFailed() {
+                replaceImage(
+                        AztecText.getPlaceholderDrawableFromResID(context, drawableFailed, maxImagesWidth)
+                )
+            }
+
+            override fun onImageLoaded(drawable: Drawable?) {
+                replaceImage(drawable)
+            }
+
+            override fun onImageLoading(drawable: Drawable?) {
+                replaceImage(drawable ?: loadingDrawable)
+            }
+
+            private fun replaceImage(drawable: Drawable?) {
+                span.drawable = drawable
+                post {
+                    refreshText(false)
+                    loadImage(spans, index+1)
+                }
+
+            }
+        }
+        imageGetter?.loadImage(span.getSource(), callbacks, maxDimension, minImagesWidth)
+
     }
 
     private fun loadVideos() {
